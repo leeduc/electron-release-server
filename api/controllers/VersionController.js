@@ -9,6 +9,9 @@ var actionUtil = require('sails/lib/hooks/blueprints/actionUtil');
 var url = require('url');
 var Promise = require('bluebird');
 var semver = require('semver');
+var checksum = require('checksum');
+var fs = require('fs');
+var crypto = require('crypto');
 
 module.exports = {
 
@@ -41,6 +44,7 @@ module.exports = {
     var platform = req.param('platform');
     var version = req.param('version');
     var channel = req.param('channel') || 'stable';
+    var fileType = platform === 'win32_x64' || platform === 'win32_x32' ? 'nupkg' : 'zip';
 
     if (!version) {
       return res.badRequest('Requires `version` parameter');
@@ -100,7 +104,7 @@ module.exports = {
               function(prevNotes, newVersion) {
 
                 newVersion.assets = _.filter(newVersion.assets, function(asset) {
-                  return asset.filetype === '.zip';
+                  return asset.filetype === `.${fileType}`;
                 });
 
                 // If one of the assets for this verison apply to our desired
@@ -139,15 +143,29 @@ module.exports = {
 
             sails.log.debug('Version candidate accepted');
 
-            return res.ok({
-              url: url.resolve(
-                sails.config.appUrl,
-                '/download/' + latestVersion.name + '/' +
-                latestVersion.assets[0].platform + '?filetype=zip'
-              ),
-              name: latestVersion.name,
-              notes: releaseNotes,
-              pub_date: latestVersion.createdAt.toISOString()
+            let path = url.resolve(
+              sails.config.appUrl,
+              '/download/' + latestVersion.name + '/' +
+              latestVersion.assets[0].platform + `?filetype=${fileType}#/eoffice.${latestVersion.assets[0].name}`
+            );
+
+            function checksum (str, algorithm, encoding) {
+                return crypto
+                    .createHash(algorithm || 'sha512')
+                    .update(str, 'utf8')
+                    .digest(encoding || 'hex')
+            }
+
+            fs.readFile(latestVersion.assets[0].fd, function (err, data) {
+              return res.ok({
+                url: path,
+                path: path,
+                sha512: checksum(data),
+                name: latestVersion.name,
+                version: latestVersion.name,
+                notes: releaseNotes,
+                pub_date: latestVersion.createdAt.toISOString()
+              });
             });
           });
       })
