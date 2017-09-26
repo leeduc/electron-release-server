@@ -44,7 +44,7 @@ module.exports = {
     var platform = req.param('platform');
     var version = req.param('version');
     var channel = req.param('channel') || 'stable';
-    var fileType = platform === 'win32_x64' || platform === 'win32_x32' ? 'nupkg' : 'zip';
+    var fileType = platform === 'win32_x64' || platform === 'win32_x32' ? 'exe' : 'zip';
 
     if (!version) {
       return res.badRequest('Requires `version` parameter');
