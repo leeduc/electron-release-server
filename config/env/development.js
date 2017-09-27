@@ -19,6 +19,7 @@ module.exports = {
 
   models: {
     connection: 'postgresql'
-  }
+  },
 
+  port: process.env['port'] || 5000
 };
