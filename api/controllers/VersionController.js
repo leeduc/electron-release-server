@@ -142,9 +142,9 @@ module.exports = {
             }
 
             sails.log.debug('Version candidate accepted');
-
+			console.log(process.env);
             let path = url.resolve(
-              sails.config.appUrl,
+              process.env.APP_URL,
               '/download/' + latestVersion.name + '/' +
               latestVersion.assets[0].platform + `?filetype=${fileType}#/eoffice.${latestVersion.assets[0].name}`
             );
