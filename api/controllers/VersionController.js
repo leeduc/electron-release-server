@@ -142,7 +142,6 @@ module.exports = {
             }
 
             sails.log.debug('Version candidate accepted');
-			console.log(process.env);
             let path = url.resolve(
               process.env.APP_URL,
               '/download/' + latestVersion.name + '/' +
