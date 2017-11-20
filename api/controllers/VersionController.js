@@ -146,7 +146,7 @@ module.exports = {
             let path = url.resolve(
               process.env.APP_URL,
               '/download/' + latestVersion.name + '/' +
-              latestVersion.assets[0].platform + `?filetype=${fileType}#/eoffice.${latestVersion.assets[0].name}`
+              latestVersion.assets[0].platform + `/${latestVersion.assets[0].name}?filetype=${fileType}`
             );
 
             function checksum (str, algorithm, encoding) {
